@@ -121,7 +121,7 @@ class GraphModuleNode:
     def __repr__(self):
         mot = "entree" if self.entry else "sortie" if self.exit else ""
         return f"{str(self.id)}:{str(self.how_many_neightboors)} connections {mot}"
-
+erg
 def node_inventory(lab_matrix):
     l,c = lab_matrix.shape
 
