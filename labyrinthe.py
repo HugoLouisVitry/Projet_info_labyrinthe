@@ -73,6 +73,11 @@ import numpy as np
 
 # redéfinissez le chemin ( click droit + 'copy path' )
 Labyrinthe = "C:\A Mes dossiers\Cours\Supérieur\ENAC\Informatique\Projet Labyrinthe\Labyrinthe.txt"
+#Labyrinthe = "/media/Windows/A Mes dossiers/Cours/Supérieur/ENAC/Informatique/Projet Labyrinthe/Labyrinthe.txt"
+
+
+
+
 
 
 # === CONVERSION FICHIER EN MATRICE ===
@@ -98,7 +103,12 @@ def convert_lab(file):
     return lab_matrix
 
 
-# === IDENTIFICATION DES NOEUDS ET DISTANCES ===
+
+
+
+
+
+# === IDENTIFICATION DES NOEUDS, DISTANCES ET RELATIONS ===
 
 
 # classe temporaire, on la rempacera par celle du module pour le graphe
@@ -122,54 +132,86 @@ class GraphModuleNode:
         mot = "entree" if self.entry else "sortie" if self.exit else ""
         return f"{str(self.id)}:{str(self.how_many_neightboors)} connections {mot}"
 
+
 def node_inventory(lab_matrix):
     l,c = lab_matrix.shape
 
     #contient les noeuds identifiés par coordonnées
     nodes = {}
+    
+    #matrice des directions de voisinage [ligne,colone,position physique 0 hut, 1 gauche 2 droite,3 bas]
+    coord_neightboor = np.array([       [-1,+0,0],
+                                 [+0,-1,1],       [+0,1,2],
+                                        [+1,+0,3]   ])
 
     def neightboors(i,j):
-        #matrice intermédiaire ( forme chelou mais visuelle )
-        coord_neightboor = np.array([       [-1,+0],
-                                     [+0,-1],       [+0,1],
-                                            [+1,+0]   ])
+    
         nb = 0
         for cn in coord_neightboor: # recherche en '+'
             conditions = [i+cn[0] >=0, j+cn[1] >= 0, i+cn[0] < l, j+cn[1] <c]
             if  all(conditions):
                 if not lab_matrix[i+cn[0],j+cn[1]] :
                     nb+=1
+                if lab_matrix[i+cn[0],j+cn[1]] == 2 or lab_matrix[i+cn[0],j+cn[1]] == 3:
+                    nb+=1
+                
         return nb
 
     #recherche des noeuds
+    turn = []
     for i in range(l):
         for j in range(c):
             
-            
+            nb = neightboors(i,j)
+
             if lab_matrix[i,j] == 2:            #entree
                 nodes[(i,j)] = GraphModuleNode((i,j))
                 nodes[(i,j)].define_as_entry()
-                nodes[(i,j)].how_many_neightboors=neightboors(i,j)
+                nodes[(i,j)].how_many_neightboors=nb
 
             if lab_matrix[i,j] == 3:            #sortie
                 nodes[(i,j)] = GraphModuleNode((i,j))
                 nodes[(i,j)].define_as_exit()
-                nodes[(i,j)].how_many_neightboors=neightboors(i,j)
-                
+                nodes[(i,j)].how_many_neightboors=nb
 
-            if not lab_matrix[i,j]:
-                nb = neightboors(i,j)             #noeud quelquonque
-                if nb == 3 or nb == 4:
+
+            if not lab_matrix[i,j]:   
+                if nb == 1 or nb == 3 or nb == 4:          #noeud quelquonque
                     nodes[(i,j)] = GraphModuleNode((i,j))
                     nodes[(i,j)].how_many_neightboors=nb
+                if nb == 2: 
+                    turn.append((i,j))
+    
+ 
+    # ajout des noeuds voisin et de leurs distance (poids)
+#    for node in nodes:
+#        (i,j) = node
+#        for cn in coord_neightboor:
+#            d=0
+#            if not lab_matrix[i+cn[0],j+cn[1]]:
+#                d+=1
+#                
+#                if not cn[2]: # haut
+#                    k=0
+#                    while not lab_matrix[i+cn[0]+k,j]:
+#                        if (i+cn[0]+k,j) in nodes:
+#                            node.neightboors_dist[i+cn[0]+k,j]=d+k
+#                        k+=1
+#                        if (i+cn[0]+k,j) in turn:
+#
+#                if cn[2]: # gauche
+#                if cn[2] == 2: # droite
+#                if cn[2] == 3: # bas
+#
                     
     return nodes
 
 
-def get_all(lab_file):
-    Lab_matrix = convert_lab(lab_file)
-    Nodes = node_inventory(Lab_matrix)
-    return Lab_matrix,Nodes
+
+
+
+
+
 
 
 # === INTERFACE GRAPHIQUE ===
@@ -206,12 +248,29 @@ def draw(canvas,matrix):
             if matrix[i][j] == 2 :
                 x1, y1 = j * SIZE, i * SIZE
                 x2, y2 = x1 + SIZE, y1 + SIZE
-                canvas.create_rectangle(x1, y1, x2, y2, fill='green', outline='white')
+                canvas.create_rectangle(x1, y1, x2, y2, fill='white', outline='black')
+
+                if i == 0 and j != 0:
+                    canvas.create_line((x1+x2)/2, y1, (x1+x2)/2, y2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
+                elif i == len(matrix) -1 and j != 0:
+                    canvas.create_line((x1+x2)/2, y2, (x1+x2)/2, y1, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
+                elif j == 0 and i != 0:
+                    canvas.create_line(x1, (y1+y2)/2, x2, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
+                elif j == len(matrix[0]) and i != 0:
+                    canvas.create_line(x2, (y1+y2)/2, x1, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
             #sortie
             if matrix[i][j] == 3 :
                 x1, y1 = j * SIZE, i * SIZE
                 x2, y2 = x1 + SIZE, y1 + SIZE
-                canvas.create_rectangle(x1, y1, x2, y2, fill='purple', outline='white')
+                canvas.create_rectangle(x1, y1, x2, y2, fill='white', outline='black')
+                if i == len(matrix) - 1 and j != 0:
+                    canvas.create_line((x1+x2)/2, y1, (x1+x2)/2, y2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
+                elif i == 0 and j!= 0:
+                    canvas.create_line((x1+x2)/2, y2, (x1+x2)/2, y1, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
+                elif j == len(matrix[0]) and i != 0:
+                    canvas.create_line(x1, (y1+y2)/2, x2, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
+                elif j == 0 and i != 0:
+                    canvas.create_line(x2, (y1+y2)/2, x1, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
 
             #case actuelle
             if matrix[i][j] == 4 :
@@ -225,20 +284,26 @@ def draw(canvas,matrix):
                 canvas.create_rectangle(x1, y1, x2, y2, fill='cyan', outline='white')
 
 
-# il s'agit d'un objet qui fera référence 
-# à l'état d'avancement de l'algorithme de recherche 
-# il est la pour faire des test
-state = [(2,1),[]]
-
-#met à jour les cases de la matrice numérique
-def maj(state,matrix):
-    matrix[state[0]] = 4
-#    for i in state[1]:
-#        matrix[i]
-
-
+## il s'agit d'un objet qui fera référence 
+## à l'état d'avancement de l'algorithme de recherche 
+## il est la pour faire des test
+#state = [(2,1),[]]
+#
+##met à jour les cases de la matrice numérique
+#def maj(state,matrix):
+#    matrix[state[0]] = 4
+##    for i in state[1]:
+##        matrix[i]
 
 
+
+
+
+
+def get_all(lab_file):
+    Lab_matrix = convert_lab(lab_file)
+    Nodes = node_inventory(Lab_matrix)
+    return Lab_matrix,Nodes
 
 if __name__ == '__main__':
     test_lab=convert_lab(Labyrinthe)
@@ -246,6 +311,7 @@ if __name__ == '__main__':
     lab_node = node_inventory(test_lab)
     print("\ndictionnaire des noeuds\n")
     for i in lab_node:
-        print(lab_node[i])
+        print(lab_node[i],"|",lab_node[i].neightboors_dist)
+    
     graphics(test_lab)
     
