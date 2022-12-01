@@ -70,8 +70,9 @@
 
 import tkinter
 import numpy as np
-
+import operator
 # redéfinissez le chemin ( click droit + 'copy path' )
+
 Labyrinthe = "C:\A Mes dossiers\Cours\Supérieur\ENAC\Informatique\Projet Labyrinthe\Labyrinthe.txt"
 #Labyrinthe = "/media/Windows/A Mes dossiers/Cours/Supérieur/ENAC/Informatique/Projet Labyrinthe/Labyrinthe.txt"
 
@@ -133,36 +134,39 @@ class GraphModuleNode:
         return f"{str(self.id)}:{str(self.how_many_neightboors)} connections {mot}"
 
 
+#matrice des directions de voisinage [ligne,colone,position physique 0 haut, 1 gauche 2 droite,3 bas]
+coord_neightboor = np.array([       [-1,+0,0],
+                             [+0,-1,1],       [+0,1,2],
+                                    [+1,+0,3]   ])
+
+def neightboors(i,j,matrix): # compte le nombre de zéro et leur direction autour d'un 0 
+    l,c = matrix.shape
+    nb = 0
+    position_0 = [False]*4
+    for cn in coord_neightboor: # recherche en '+'
+        conditions = [i+cn[0] >=0, j+cn[1] >= 0, i+cn[0] < l, j+cn[1] <c]
+        if  all(conditions):
+            if not matrix[i+cn[0],j+cn[1]] :
+                nb+=1
+                position_0[cn[2]] = True
+            if matrix[i+cn[0],j+cn[1]] == 2 or matrix[i+cn[0],j+cn[1]] == 3:
+                nb+=1
+                position_0[cn[2]] = True
+            
+    return nb,position_0
+
 def node_inventory(lab_matrix):
     l,c = lab_matrix.shape
 
     #contient les noeuds identifiés par coordonnées
     nodes = {}
-    
-    #matrice des directions de voisinage [ligne,colone,position physique 0 hut, 1 gauche 2 droite,3 bas]
-    coord_neightboor = np.array([       [-1,+0,0],
-                                 [+0,-1,1],       [+0,1,2],
-                                        [+1,+0,3]   ])
-
-    def neightboors(i,j):
-    
-        nb = 0
-        for cn in coord_neightboor: # recherche en '+'
-            conditions = [i+cn[0] >=0, j+cn[1] >= 0, i+cn[0] < l, j+cn[1] <c]
-            if  all(conditions):
-                if not lab_matrix[i+cn[0],j+cn[1]] :
-                    nb+=1
-                if lab_matrix[i+cn[0],j+cn[1]] == 2 or lab_matrix[i+cn[0],j+cn[1]] == 3:
-                    nb+=1
-                
-        return nb
 
     #recherche des noeuds
-    turn = []
+    turn = {}
     for i in range(l):
         for j in range(c):
             
-            nb = neightboors(i,j)
+            nb,position_0 = neightboors(i,j,lab_matrix)
 
             if lab_matrix[i,j] == 2:            #entree
                 nodes[(i,j)] = GraphModuleNode((i,j))
@@ -179,37 +183,55 @@ def node_inventory(lab_matrix):
                 if nb == 1 or nb == 3 or nb == 4:          #noeud quelquonque
                     nodes[(i,j)] = GraphModuleNode((i,j))
                     nodes[(i,j)].how_many_neightboors=nb
-                if nb == 2: 
-                    turn.append((i,j))
-    
- 
-    # ajout des noeuds voisin et de leurs distance (poids)
+                if nb == 2:
+                    if not operator.or_(position_0[0] and position_0[3],position_0[1] and position_0[2]) :
+                        turn[(i,j)] = position_0
+
+
+# ajout des noeuds voisin et de leurs distance (poids)
+#
+# count_0 est lancé seulement si cn donne un zéro comme ça on exlcu déjà le cas de rencontre des murs
+    def count_0(i,j,direction): # récursif
+        way = coord_neightboor[direction]
+        dist = int(0)
+        k = int(1)
+        
+        while not lab_matrix[i+way[0]*k,j+way[1]*k]: 
+            dist+=1
+            if (i+way[0]*k,j+way[1]*k) in nodes :
+                return dist ,i+way[0]*k,j+way[1]*k
+                
+            elif (i+way[0]*k,j+way[1]*k) in turn :
+                change_to_direction = None
+                if way[2] in (0,3) : # vertical
+                    gauche = turn[(i+way[0]*k,j+way[1]*k)][1]
+                    # 2 vers la droite // droite = turn[(i+cn[0]*k,j+cn[1]*k)][2]
+                    change_to_direction = 1 if gauche else 2   
+                elif way[2] in (1,2) : # horizontal
+                    haut = turn[(i+way[0]*k,j+way[1]*k)][0]
+                    # 3 vers le bas // bas = turn[(i+cn[0]*k,j+cn[1]*k)][3]
+                    change_to_direction = 0 if haut else 3   
+                            
+                c=count_0(i+way[0]*k,j+way[1]*k,change_to_direction)
+                return c[0]+dist,c[1],c[2]
+            else : 
+                k+=1
+        return (0,0,0) # jamais utilisé mais j'ai des problèmes d'interpretation si je le met pas
+
+    #fin count_0
+
+#    # comptage des poids
 #    for node in nodes:
 #        (i,j) = node
-#        for cn in coord_neightboor:
-#            d=0
-#            if not lab_matrix[i+cn[0],j+cn[1]]:
-#                d+=1
-#                
-#                if not cn[2]: # haut
-#                    k=0
-#                    while not lab_matrix[i+cn[0]+k,j]:
-#                        if (i+cn[0]+k,j) in nodes:
-#                            node.neightboors_dist[i+cn[0]+k,j]=d+k
-#                        k+=1
-#                        if (i+cn[0]+k,j) in turn:
-#
-#                if cn[2]: # gauche
-#                if cn[2] == 2: # droite
-#                if cn[2] == 3: # bas
-#
-                    
-    return nodes
+#        for cn in coord_neightboor: # recherche en '+'
+#            conditions = [i+cn[0] >=0, j+cn[1] >= 0, i+cn[0] < l, j+cn[1] <c]
+#            print(conditions)
+#            if  all(conditions):
+#                if not lab_matrix[i+cn[0],j+cn[1]] :
+#                        c = count_0(i,j,cn[2])
+#                        nodes[(i,j)].neightboors_dist[(c[1],c[2])] = c[0]
 
-
-
-
-
+    return nodes,turn
 
 
 
@@ -256,7 +278,7 @@ def draw(canvas,matrix):
                     canvas.create_line((x1+x2)/2, y2, (x1+x2)/2, y1, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
                 elif j == 0 and i != 0:
                     canvas.create_line(x1, (y1+y2)/2, x2, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
-                elif j == len(matrix[0]) and i != 0:
+                elif j == len(matrix[0])-1 and i != 0:
                     canvas.create_line(x2, (y1+y2)/2, x1, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
             #sortie
             if matrix[i][j] == 3 :
@@ -267,7 +289,7 @@ def draw(canvas,matrix):
                     canvas.create_line((x1+x2)/2, y1, (x1+x2)/2, y2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
                 elif i == 0 and j!= 0:
                     canvas.create_line((x1+x2)/2, y2, (x1+x2)/2, y1, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
-                elif j == len(matrix[0]) and i != 0:
+                elif j == len(matrix[0])-1 and i != 0:
                     canvas.create_line(x1, (y1+y2)/2, x2, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
                 elif j == 0 and i != 0:
                     canvas.create_line(x2, (y1+y2)/2, x1, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
@@ -308,10 +330,14 @@ def get_all(lab_file):
 if __name__ == '__main__':
     test_lab=convert_lab(Labyrinthe)
     print("\nmatrice labyrinthe \n",test_lab)
-    lab_node = node_inventory(test_lab)
+    lab_node,turns = node_inventory(test_lab)
     print("\ndictionnaire des noeuds\n")
     for i in lab_node:
         print(lab_node[i],"|",lab_node[i].neightboors_dist)
-    
+    print("\n virages \n")
+    for i in turns:
+        print(i)
     graphics(test_lab)
+
+
     
