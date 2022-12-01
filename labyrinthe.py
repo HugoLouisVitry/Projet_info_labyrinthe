@@ -220,16 +220,15 @@ def node_inventory(lab_matrix):
 
     #fin count_0
 
-#    # comptage des poids
-#    for node in nodes:
-#        (i,j) = node
-#        for cn in coord_neightboor: # recherche en '+'
-#            conditions = [i+cn[0] >=0, j+cn[1] >= 0, i+cn[0] < l, j+cn[1] <c]
-#            print(conditions)
-#            if  all(conditions):
-#                if not lab_matrix[i+cn[0],j+cn[1]] :
-#                        c = count_0(i,j,cn[2])
-#                        nodes[(i,j)].neightboors_dist[(c[1],c[2])] = c[0]
+    # comptage des poids
+    for node in nodes:
+        (i,j) = node
+        for cn in coord_neightboor: # recherche en '+'
+            conditions = [i+cn[0] >=0, j+cn[1] >= 0, i+cn[0] < l, j+cn[1] < c]
+            if  all(conditions):
+                if not lab_matrix[i+cn[0],j+cn[1]] :
+                        c0 = count_0(i,j,cn[2])
+                        nodes[(i,j)].neightboors_dist[(c0[1],c0[2])] = c0[0]
 
     return nodes,turn
 
