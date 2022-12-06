@@ -16,11 +16,11 @@ def chemins_voisins(mur):
     nb = 0
     if (lab[mur[0]-1][mur[1]] == 0):
         nb += 1
-    if (lab[mur[0]+1][mur[1]] == 0):
+    elif (lab[mur[0]+1][mur[1]] == 0):
         nb += 1
-    if (lab[mur[0]][mur[1]-1] == 0):
+    elif (lab[mur[0]][mur[1]-1] == 0):
         nb +=1
-    if (lab[mur[0]][mur[1]+1] == 0):
+    elif (lab[mur[0]][mur[1]+1] == 0):
         nb += 1
     return nb
             
@@ -36,7 +36,7 @@ def entree_sortie(lignes, colonnes):
             lab[0][i] = 2
             break
     for i in range(colonnes-1, 0, -1):
-        if (lab[lignes-2][i] == 0):
+        elif (lab[lignes-2][i] == 0):
             lab[lignes-1][i] = 3
             break
 def creer_lab(lignes, colonnes):
@@ -46,11 +46,11 @@ def creer_lab(lignes, colonnes):
     
     if ligne1 == 0:
         ligne1 += 1
-    if ligne1 == lignes-1:
+    elif ligne1 == lignes-1:
         ligne1 -= 1
-    if colonne1 == 0:
+    elif colonne1 == 0:
         colonne1 += 1
-    if colonne1 == colonnes-1:
+    elif colonne1 == colonnes-1:
         colonne1 -= 1
         
     lab[ligne1][colonne1] = 0
@@ -85,25 +85,25 @@ def creer_lab(lignes, colonnes):
                             lab[mur[0]-1][mur[1]] = 1
                             if ([mur[0]-1, mur[1]] not in murs):
                                 murs.append([mur[0]-1, mur[1]])
-                    if (mur[0] != lignes-1):
+                    elif (mur[0] != lignes-1):
                         if (lab[mur[0]+1][mur[1]] != 0):
                             lab[mur[0]+1][mur[1]] = 1
-                        if ([mur[0]+1, mur[1]] not in murs):
+                        elif ([mur[0]+1, mur[1]] not in murs):
                             murs.append([mur[0]+1, mur[1]])
     
     				# Leftmost cell
-                    if (mur[1] != 0):	
+                    elif (mur[1] != 0):	
                         if (lab[mur[0]][mur[1]-1] != 0):
                             lab[mur[0]][mur[1]-1] = 1
-                        if ([mur[0], mur[1]-1] not in murs):
+                        elif ([mur[0], mur[1]-1] not in murs):
                             murs.append([mur[0], mur[1]-1])
     			
                     
                     
                 delete_wall(mur)
-                continue
+               
             
-        if mur[0] != 0:
+        elif mur[0] != 0:
             if lab[mur[0]-1][mur[1]] == 4 and  lab[mur[0]+1][mur[1]] == 0:
                 nb = chemins_voisins(mur)
                 if nb < 2:
@@ -112,25 +112,25 @@ def creer_lab(lignes, colonnes):
                     if (mur[0] != 0):
                         if (lab[mur[0]-1][mur[1]] != 0):
                             lab[mur[0]-1][mur[1]] = 1
-                        if ([mur[0]-1, mur[1]] not in murs):
+                        elif ([mur[0]-1, mur[1]] not in murs):
                             murs.append([mur[0]-1, mur[1]])
-                    if (mur[1] != 0):
+                    elif (mur[1] != 0):
                         if (lab[mur[0]][mur[1]-1] != 0):
                             lab[mur[0]][mur[1]-1] = 1
-                        if ([mur[0], mur[1]-1] not in murs):
+                        elif ([mur[0], mur[1]-1] not in murs):
                             murs.append([mur[0], mur[1]-1])
-                    if (mur[1] != colonnes-1):
+                    elif (mur[1] != colonnes-1):
                         if (lab[mur[0]][mur[1]+1] != 0):
                             lab[mur[0]][mur[1]+1] = 1 
-                        if ([mur[0], mur[1]+1] not in murs):
+                        elif ([mur[0], mur[1]+1] not in murs):
                             murs.append([mur[0], mur[1]+1])
                                 
                     
                 delete_wall(mur)
-                continue
+               
     
                 
-        if mur[1] != colonnes -1:
+        elif mur[1] != colonnes -1:
             if lab[mur[0]][mur[1]-1] == 0 and lab[mur[0]][mur[1]+1] == 4:
                 nb = chemins_voisins(mur)
                 if nb < 2:
@@ -139,23 +139,23 @@ def creer_lab(lignes, colonnes):
                     if (mur[1] != colonnes-1):
                         if (lab[mur[0]][mur[1]+1] != 0):
                             lab[mur[0]][mur[1]+1] = 1
-                        if ([mur[0], mur[1]+1] not in murs):
+                        elif ([mur[0], mur[1]+1] not in murs):
                             murs.append([mur[0], mur[1]+1])
-                    if (mur[0] != lignes-1):
+                    elif (mur[0] != lignes-1):
                         if (lab[mur[0]+1][mur[1]] != 0):
                             lab[mur[0]+1][mur[1]] = 1
-                        if ([mur[0]+1, mur[1]] not in murs):
+                        elif ([mur[0]+1, mur[1]] not in murs):
                             murs.append([mur[0]+1, mur[1]])
-                    if (mur[0] != 0):	
+                    elif (mur[0] != 0):	
                         if (lab[mur[0]-1][mur[1]] != 0):
                             lab[mur[0]-1][mur[1]] = 1
-                        if ([mur[0]-1, mur[1]] not in murs):
+                        elif ([mur[0]-1, mur[1]] not in murs):
                             murs.append([mur[0]-1, mur[1]])
                             
                 delete_wall(mur)
-                continue
+               
     
-        if mur[0] != lignes -1:
+        elif mur[0] != lignes -1:
             if lab[mur[0]-1][mur[1]] == 0 and  lab[mur[0]+1][mur[1]] == 4:
                 nb = chemins_voisins(mur)
                 if nb < 2:
@@ -164,29 +164,29 @@ def creer_lab(lignes, colonnes):
                     if (mur[0] != lignes-1):
                         if (lab[mur[0]+1][mur[1]] != 0):
                             lab[mur[0]+1][mur[1]] = 1
-                        if ([mur[0]+1, mur[1]] not in murs):
+                        elif ([mur[0]+1, mur[1]] not in murs):
                             murs.append([mur[0]+1, mur[1]])
-                    if (mur[1] != 0):
+                    elif (mur[1] != 0):
                         if (lab[mur[0]][mur[1]-1] != 1):
                             lab[mur[0]][mur[1]-1] = 0
-                        if ([mur[0], mur[1]-1] not in murs):
+                        elif ([mur[0], mur[1]-1] not in murs):
                             murs.append([mur[0], mur[1]-1])
-                    if (mur[1] != colonnes-1):
+                    elif (mur[1] != colonnes-1):
                         if (lab[mur[0]][mur[1]+1] != 0):
                             lab[mur[0]][mur[1]+1] = 1
-                        if ([mur[0], mur[1]+1] not in murs):
+                        elif ([mur[0], mur[1]+1] not in murs):
                             murs.append([mur[0], mur[1]+1])
                     
         
                 delete_wall(mur)
-                continue
+                
         delete_wall(mur)
                 
     
     creer_mur(lignes, colonnes)
     entree_sortie(lignes, colonnes)
     
-    #print_maze(maze)
+    
     
 
 
