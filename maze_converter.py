@@ -277,13 +277,15 @@ def draw(canvas,matrix):
                 canvas.create_rectangle(x1, y1, x2, y2, fill='white', outline='black')
 
                 if i == 0 and j != 0:
-                    canvas.create_line((x1+x2)/2, y1, (x1+x2)/2, y2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
+                    canvas.create_line((x1+x2)/2, y1, (x1+x2)/2, y2, arrow=tkinter.LAST, fill='green', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
                 elif i == len(matrix) -1 and j != 0:
-                    canvas.create_line((x1+x2)/2, y2, (x1+x2)/2, y1, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
+                    canvas.create_line((x1+x2)/2, y2, (x1+x2)/2, y1, arrow=tkinter.LAST, fill='green', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
                 elif j == 0 and i != 0:
-                    canvas.create_line(x1, (y1+y2)/2, x2, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
+                    canvas.create_line(x1, (y1+y2)/2, x2, (y1+y2)/2, arrow=tkinter.LAST, fill='green', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
                 elif j == len(matrix[0])-1 and i != 0:
-                    canvas.create_line(x2, (y1+y2)/2, x1, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
+                    canvas.create_line(x2, (y1+y2)/2, x1, (y1+y2)/2, arrow=tkinter.LAST, fill='green', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
+                else:
+                    canvas.create_oval(x1, y1, x2, y2, fill='green', outline='black')
             #sortie
             if matrix[i][j] == 3 :
                 x1, y1 = j * SIZE, i * SIZE
@@ -297,6 +299,8 @@ def draw(canvas,matrix):
                     canvas.create_line(x1, (y1+y2)/2, x2, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
                 elif j == 0 and i != 0:
                     canvas.create_line(x2, (y1+y2)/2, x1, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
+                else:
+                    canvas.create_oval(x1, y1, x2, y2, fill='red', outline='black')
 
             #case actuelle
             if matrix[i][j] == 4 :
@@ -308,6 +312,13 @@ def draw(canvas,matrix):
                 x1, y1 = j * SIZE, i * SIZE
                 x2, y2 = x1 + SIZE, y1 + SIZE
                 canvas.create_rectangle(x1, y1, x2, y2, fill='cyan', outline='white')
+
+def update_final(matrix,path):
+    print(path)
+    for node_id in path:
+        (i,j) = node_id
+        matrix[i][j] = 5 
+
 
 
 ## il s'agit d'un objet qui fera référence 
