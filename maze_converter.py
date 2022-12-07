@@ -1,4 +1,5 @@
 
+
 #111E1111111111111
 #10000000001010001
 #11111110101011011
@@ -71,11 +72,12 @@
 import tkinter
 import numpy as np
 import operator
+import parcourmono
 # redéfinissez le chemin ( click droit + 'copy path' )
 
-Labyrinthe = "C:\A Mes dossiers\Cours\Supérieur\ENAC\Informatique\Projet Labyrinthe\Labyrinthe.txt"
+#Labyrinthe = "C:\A Mes dossiers\Cours\Supérieur\ENAC\Informatique\Projet Labyrinthe\Labyrinthe.txt"
 #Labyrinthe = "/media/Windows/A Mes dossiers/Cours/Supérieur/ENAC/Informatique/Projet Labyrinthe/Labyrinthe.txt"
-
+Labyrinthe = "lab.txt"
 
 
 
@@ -112,26 +114,26 @@ def convert_lab(file):
 # === IDENTIFICATION DES NOEUDS, DISTANCES ET RELATIONS ===
 
 
-# classe temporaire, on la rempacera par celle du module pour le graphe
-class GraphModuleNode:
-    def __init__(self,id):
-        self.id = id   # coordonnees de la matrice, mettez un tuple
-        self.neightboors_dist = {} # id voisin + distance
-        self.how_many_neightboors = len(self.neightboors_dist) # en pratique on lui attribue lors de la recherche des noeuds
-        self.entry = False
-        self.exit = False
-
-    def define_as_exit(self):
-        self.exit = True
-        self.entry = False
-
-    def define_as_entry(self):
-        self.entry = True
-        self.exit = False
-    
-    def __repr__(self):
-        mot = "entree" if self.entry else "sortie" if self.exit else ""
-        return f"{str(self.id)}:{str(self.how_many_neightboors)} connections {mot}"
+## classe temporaire, on la rempacera par celle du module pour le graphe
+#class parcourmono.Node:
+#    def __init__(self,id):
+#        self.id = id   # coordonnees de la matrice, mettez un tuple
+#        self.neightboors_dist = {} # id voisin + distance
+#        self.how_many_neightboors = len(self.neightboors_dist) # en pratique on lui attribue lors de la recherche des noeuds
+#        self.entry = False
+#        self.exit = False
+#
+#    def define_as_exit(self):
+#        self.exit = True
+#        self.entry = False
+#
+#    def define_as_entry(self):
+#        self.entry = True
+#        self.exit = False
+#    
+#    def __repr__(self):
+#        mot = "entree" if self.entry else "sortie" if self.exit else ""
+#        return f"{str(self.id)}:{str(self.how_many_neightboors)} connections {mot}"
 
 
 #matrice des directions de voisinage [ligne,colone,position physique 0 haut, 1 gauche 2 droite,3 bas]
@@ -169,19 +171,19 @@ def node_inventory(lab_matrix):
             nb,position_0 = neightboors(i,j,lab_matrix)
 
             if lab_matrix[i,j] == 2:            #entree
-                nodes[(i,j)] = GraphModuleNode((i,j))
+                nodes[(i,j)] = parcourmono.Node((i,j))
                 nodes[(i,j)].define_as_entry()
                 nodes[(i,j)].how_many_neightboors=nb
 
             if lab_matrix[i,j] == 3:            #sortie
-                nodes[(i,j)] = GraphModuleNode((i,j))
+                nodes[(i,j)] = parcourmono.Node((i,j))
                 nodes[(i,j)].define_as_exit()
                 nodes[(i,j)].how_many_neightboors=nb
 
 
             if not lab_matrix[i,j]:   
                 if nb == 1 or nb == 3 or nb == 4:          #noeud quelquonque
-                    nodes[(i,j)] = GraphModuleNode((i,j))
+                    nodes[(i,j)] = parcourmono.Node((i,j))
                     nodes[(i,j)].how_many_neightboors=nb
                 if nb == 2:
                     if not operator.or_(position_0[0] and position_0[3],position_0[1] and position_0[2]) :
@@ -195,8 +197,8 @@ def node_inventory(lab_matrix):
         way = coord_neightboor[direction]
         dist = int(0)
         k = int(1)
-        
-        while not lab_matrix[i+way[0]*k,j+way[1]*k]: 
+        cond =[not lab_matrix[i+way[0]*k,j+way[1]*k],lab_matrix[i+way[0]*k,j+way[1]*k]==3,lab_matrix[i+way[0]*k,j+way[1]*k]==2]
+        while any(cond): 
             dist+=1
             if (i+way[0]*k,j+way[1]*k) in nodes :
                 return dist ,i+way[0]*k,j+way[1]*k
@@ -229,6 +231,9 @@ def node_inventory(lab_matrix):
                 if not lab_matrix[i+cn[0],j+cn[1]] :
                         c0 = count_0(i,j,cn[2])
                         nodes[(i,j)].neightboors_dist[(c0[1],c0[2])] = c0[0]
+                if lab_matrix[i+cn[0],j+cn[1]] == 3 or lab_matrix[i+cn[0],j+cn[1]] == 2 :
+                    c0 = count_0(i,j,cn[2])
+                    nodes[(i,j)].neightboors_dist[(c0[1],c0[2])] = c0[0] + 1
 
     return nodes,turn
 
@@ -323,7 +328,7 @@ def draw(canvas,matrix):
 
 def get_all(lab_file):
     Lab_matrix = convert_lab(lab_file)
-    Nodes = node_inventory(Lab_matrix)
+    Nodes = node_inventory(Lab_matrix)[0]
     return Lab_matrix,Nodes
 
 if __name__ == '__main__':
