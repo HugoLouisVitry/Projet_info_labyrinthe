@@ -72,7 +72,7 @@
 import tkinter
 import numpy as np
 import operator
-import parcourmono
+import parcoursmono
 # redéfinissez le chemin ( click droit + 'copy path' )
 
 #Labyrinthe = "C:\A Mes dossiers\Cours\Supérieur\ENAC\Informatique\Projet Labyrinthe\Labyrinthe.txt"
@@ -171,19 +171,19 @@ def node_inventory(lab_matrix):
             nb,position_0 = neightboors(i,j,lab_matrix)
 
             if lab_matrix[i,j] == 2:            #entree
-                nodes[(i,j)] = parcourmono.Node((i,j))
+                nodes[(i,j)] = parcoursmono.Node((i,j))
                 nodes[(i,j)].define_as_entry()
                 nodes[(i,j)].how_many_neightboors=nb
 
             if lab_matrix[i,j] == 3:            #sortie
-                nodes[(i,j)] = parcourmono.Node((i,j))
+                nodes[(i,j)] = parcoursmono.Node((i,j))
                 nodes[(i,j)].define_as_exit()
                 nodes[(i,j)].how_many_neightboors=nb
 
 
             if not lab_matrix[i,j]:   
                 if nb == 1 or nb == 3 or nb == 4:          #noeud quelquonque
-                    nodes[(i,j)] = parcourmono.Node((i,j))
+                    nodes[(i,j)] = parcoursmono.Node((i,j))
                     nodes[(i,j)].how_many_neightboors=nb
                 if nb == 2:
                     if not operator.or_(position_0[0] and position_0[3],position_0[1] and position_0[2]) :
