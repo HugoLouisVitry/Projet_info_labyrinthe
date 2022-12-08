@@ -2,7 +2,7 @@
 import numpy as np
 import math as m
 
-import Maze_converter
+import maze_converter
 import pimped_heap
 
 
@@ -104,9 +104,9 @@ def parcours_mono (nodes , id_entree , id_sortie ) :
 
 if __name__ == '__main__':
     Maze_file= "lab.txt"
-    Graphic_maze,nodes = Maze_converter.get_all(Maze_file)
+    Graphic_maze,nodes = maze_converter.get_all(Maze_file)
     #print(nodes)
-    Maze_converter.graphics(Graphic_maze)
+    maze_converter.graphics(Graphic_maze)
 
     for NODE in nodes:
         #print(str(NODE)+"->",nodes[NODE].neightboors_dist,"\n")
@@ -115,7 +115,7 @@ if __name__ == '__main__':
         if nodes[NODE].exit:
             id_sortie = nodes[NODE].id
     chemin=parcours_mono(nodes,id_entree,id_sortie)[0]
-    Maze_converter.update_final(Graphic_maze,chemin)
-    Maze_converter.graphics(Graphic_maze)
+    maze_converter.update_final(Graphic_maze,chemin)
+    maze_converter.graphics(Graphic_maze)
 
     
