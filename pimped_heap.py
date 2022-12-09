@@ -45,3 +45,19 @@ def _siftdown(heap, startpos, pos):
             continue
         break
     heap[pos] = newitem
+
+
+def decrease_key(heap, node):
+    while node:
+        heap.append(node)
+        # calculate the offset of the parent
+        i = heap.index(node)
+        parentpos = (i - 1) >> 1
+        if heap[parentpos].dist < heap[i].dist:
+            break
+        _swap(heap,i, parentpos)
+        i = parentpos
+
+def _swap(heap, i, j):
+    heap[i], heap[j] = heap[j], heap[i]
+
