@@ -1,7 +1,5 @@
 
-import numpy as np
 import math as m
-
 import maze_converter
 import pimped_heap
 
@@ -46,7 +44,7 @@ def traverse (nodes , u ) :
     
 #parcours_mono prend en parametre un dictionnaire les clés sont les identifiants des noeuds 
 #et les valeurs sont des noeuds de la classe noeud de hugo
-def parcours_mono (nodes) : 
+def dijkstra_mono (nodes) : 
 
     for node in nodes : 
         nodes[node].dist = m.inf
@@ -61,14 +59,14 @@ def parcours_mono (nodes) :
     heap =[nodes[id_entree]]
 
     while heap :
-        print("\n while heap: ",heap)
+        #print("\n while heap: ",heap)
         node = pimped_heap.heappop(heap)
         node.closed = True
         if node.id == id_sortie :
            return (traverse(nodes , id_sortie ), node.dist )
         for voisin_id in node.neightboors_dist:
-            print("heap: ",heap)
-            print("actual: ",node,voisin_id)
+            #print("heap: ",heap)
+            #print("actual: ",node,voisin_id)
             voisin_dist=node.neightboors_dist[voisin_id]
             if not nodes[voisin_id].closed :
                dist = node.dist + voisin_dist
@@ -79,10 +77,10 @@ def parcours_mono (nodes) :
                 v.pred = node.id
                 if vpred is None :
                     pimped_heap.heappush( heap , v )
-                    print("push: ",v)
+                    #print("push: ",v)
                  
                 else :
-                    print("decrease: ",v)
+                    #print("decrease: ",v)
                     pimped_heap.decrease_key(heap , v )
                 
 
@@ -100,7 +98,7 @@ if __name__ == '__main__':
     #        id_entree = nodes[NODE].id
     #    if nodes[NODE].exit:
     #        id_sortie = nodes[NODE].id
-    chemin,distance=parcours_mono(nodes)
+    chemin,distance=dijkstra_mono(nodes)
     print(distance)
     maze_converter.update_final(Graphic_maze,chemin)
     maze_converter.graphics(Graphic_maze)
