@@ -6,7 +6,13 @@ import tkinter
 import numpy as np
 import operator
 import parcoursmono
-# redéfinissez le chemin ( click droit + 'copy path' )
+
+CHEMIN = 0
+MUR = 1
+ENTREE = 2
+SORTIE = 3
+VISITIED = 5
+ACTUAL = 6
 
 #Labyrinthe = "C:\A Mes dossiers\Cours\Supérieur\ENAC\Informatique\Projet Labyrinthe\Labyrinthe.txt"
 #Labyrinthe = "/media/Windows/A Mes dossiers/Cours/Supérieur/ENAC/Informatique/Projet Labyrinthe/Labyrinthe.txt"
@@ -27,10 +33,10 @@ def convert_lab(file):
             if char.isdecimal() :
                 L[k] = int(char)
             else :
-                if char == 'E' or char == 2:
-                    L[k] = 2
-                if char == 'S' or char == 3:
-                    L[k] = 3
+                if char == 'E' or char == ENTREE:
+                    L[k] = ENTREE
+                if char == 'S' or char == SORTIE:
+                    L[k] = SORTIE
                 if k == len(line)-1:
                     pass            
         M.append(L)
@@ -84,7 +90,7 @@ def neightboors(i,j,matrix): # compte le nombre de zéro et leur direction autou
             if not matrix[i+cn[0],j+cn[1]] :
                 nb+=1
                 position_0[cn[2]] = True
-            if matrix[i+cn[0],j+cn[1]] == 2 or matrix[i+cn[0],j+cn[1]] == 3:
+            if matrix[i+cn[0],j+cn[1]] == ENTREE or matrix[i+cn[0],j+cn[1]] == SORTIE:
                 nb+=1
                 position_0[cn[2]] = True
             
@@ -103,12 +109,12 @@ def node_inventory(lab_matrix):
             
             nb,position_0 = neightboors(i,j,lab_matrix)
 
-            if lab_matrix[i,j] == 2:            #entree
+            if lab_matrix[i,j] == ENTREE:            #entree
                 nodes[(i,j)] = parcoursmono.Node((i,j))
                 nodes[(i,j)].define_as_entry()
                 nodes[(i,j)].how_many_neightboors=nb
 
-            if lab_matrix[i,j] == 3:            #sortie
+            if lab_matrix[i,j] == SORTIE:            #sortie
                 nodes[(i,j)] = parcoursmono.Node((i,j))
                 nodes[(i,j)].define_as_exit()
                 nodes[(i,j)].how_many_neightboors=nb
@@ -164,7 +170,7 @@ def node_inventory(lab_matrix):
                 if not lab_matrix[i+cn[0],j+cn[1]] :
                         c0 = count_0(i,j,cn[2])
                         nodes[(i,j)].neightboors_dist[(c0[1],c0[2])] = c0[0]
-                if lab_matrix[i+cn[0],j+cn[1]] == 3 or lab_matrix[i+cn[0],j+cn[1]] == 2 :
+                if lab_matrix[i+cn[0],j+cn[1]] == SORTIE or lab_matrix[i+cn[0],j+cn[1]] == ENTREE :
                     c0 = count_0(i,j,cn[2])
                     nodes[(i,j)].neightboors_dist[(c0[1],c0[2])] = c0[0] + 1
 
@@ -204,7 +210,7 @@ def draw(canvas,matrix):
                 x2, y2 = x1 + SIZE, y1 + SIZE
                 canvas.create_rectangle(x1, y1, x2, y2, fill='white', outline='black')
             #entrée
-            if matrix[i][j] == 2 :
+            if matrix[i][j] == ENTREE :
                 x1, y1 = j * SIZE, i * SIZE
                 x2, y2 = x1 + SIZE, y1 + SIZE
                 canvas.create_rectangle(x1, y1, x2, y2, fill='white', outline='black')
@@ -220,7 +226,7 @@ def draw(canvas,matrix):
                 else:
                     canvas.create_oval(x1, y1, x2, y2, fill='green', outline='black')
             #sortie
-            if matrix[i][j] == 3 :
+            if matrix[i][j] == SORTIE :
                 x1, y1 = j * SIZE, i * SIZE
                 x2, y2 = x1 + SIZE, y1 + SIZE
                 canvas.create_rectangle(x1, y1, x2, y2, fill='white', outline='black')
@@ -236,12 +242,12 @@ def draw(canvas,matrix):
                     canvas.create_oval(x1, y1, x2, y2, fill='red', outline='black')
 
             #case actuelle
-            if matrix[i][j] == 4 :
+            if matrix[i][j] == ACTUAL :
                 x1, y1 = j * SIZE, i * SIZE
                 x2, y2 = x1 + SIZE, y1 + SIZE
                 canvas.create_rectangle(x1, y1, x2, y2, fill='blue', outline='white')
             #case visitée
-            if matrix[i][j] == 5 :
+            if matrix[i][j] == VISITIED :
                 x1, y1 = j * SIZE, i * SIZE
                 x2, y2 = x1 + SIZE, y1 + SIZE
                 canvas.create_rectangle(x1, y1, x2, y2, fill='red', outline='white')
@@ -250,9 +256,12 @@ def update_final(matrix,path):
     print(path)
     for node_id in path:
         (i,j) = node_id
-        matrix[i][j] = 5 
+        matrix[i][j] = VISITIED 
 
-
+def get_all(lab_file):
+    Lab_matrix = convert_lab(lab_file)
+    Nodes = node_inventory(Lab_matrix)[0]
+    return Lab_matrix,Nodes
 
 ## il s'agit d'un objet qui fera référence 
 ## à l'état d'avancement de l'algorithme de recherche 
@@ -264,16 +273,6 @@ def update_final(matrix,path):
 #    matrix[state[0]] = 4
 ##    for i in state[1]:
 ##        matrix[i]
-
-
-
-
-
-
-def get_all(lab_file):
-    Lab_matrix = convert_lab(lab_file)
-    Nodes = node_inventory(Lab_matrix)[0]
-    return Lab_matrix,Nodes
 
 if __name__ == '__main__':
     test_lab=convert_lab(Labyrinthe)
