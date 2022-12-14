@@ -1,70 +1,3 @@
-
-
-#111E1111111111111
-#10000000001010001
-#11111110101011011
-#10001000100000001
-#11101110101010101
-#10000000101010101
-#11111111101111101
-#10101010000010101
-#10101011111010111
-#10001010100000101
-#11101000111011101
-#10001010000000001
-#10111011111011101
-#10000000001010101
-#10101010101010001   
-#11111S11111111111
-#
-#
-#
-#############################
-## ALGORITHME PAR FONCTIONS #
-#############################
-#
-#
-#  TRAITEMENT DU FICHIER LABYRINTHE 
-## récupère le fichier texte
-## lire le fichier 
-## Pour chaque carractère on le met dans une liste 
-## On crée une matrice qui sera le labyrinthe dont 
-## les lignes sont les listes
-#
-## IDENTIFICATION DES PARRAMETRES 
-## identifier les noeuds
-#    # on regarde tout les zéros ,
-#        # on regarde le nombre de zéro qui entoure ce zéro ,
-#            # 1 : cul de sac
-#            # 2: c'est juste un chemin
-#            # 3 ou 4 : c'est un noeud
-
-## # === INTERFACE GRAPHIQUE === (utiliser tkinter ou turtle)
-## mettre des point noirs au mur et blanc aux chemin 
-#    # 0:chemin | 1:mur
-## symbole début arrivé 
-#    # E:2:entrée , S:3:sortie
-## état des cases
-#    #4:case actuelle,
-#    #5:case visité,
-#    #6:cul de sac,
-#    #7:meilleur chemin
-#
-## visualisation d'un point qui se déplace représentant 
-#  l'étape de recherche de l'algo, en temps réel ou sous 
-#  forme d'animation après calcul
-#       # IL s'agit d'un objet qui contient les attribut suivants
-        # dans un premier temps
-            # sa position dans la matrice 
-            # liste de toutes les cases visitées
-        # dans un deuxième temps
-            # connaissance des chemins 
-            # à determiner
-# il s'agit de mettre à jour la matrice à chaque étape en 
-# modifiant une case vide en case état ou visité 
-# voir marquer les chemins menant a des culs de sacs
-## Ajouter des couleurs
-
 ############################
 #########   CODE   #########
 ############################
@@ -94,9 +27,9 @@ def convert_lab(file):
             if char.isdecimal() :
                 L[k] = int(char)
             else :
-                if char == 'E':
+                if char == 'E' or char == 2:
                     L[k] = 2
-                if char == 'S':
+                if char == 'S' or char == 3:
                     L[k] = 3
                 if k == len(line)-1:
                     pass            
@@ -311,7 +244,7 @@ def draw(canvas,matrix):
             if matrix[i][j] == 5 :
                 x1, y1 = j * SIZE, i * SIZE
                 x2, y2 = x1 + SIZE, y1 + SIZE
-                canvas.create_rectangle(x1, y1, x2, y2, fill='cyan', outline='white')
+                canvas.create_rectangle(x1, y1, x2, y2, fill='red', outline='white')
 
 def update_final(matrix,path):
     print(path)
@@ -356,3 +289,134 @@ if __name__ == '__main__':
 
 
     
+
+
+
+
+#111E1111111111111
+
+#10000000001010001
+
+#11111110101011011
+
+#10001000100000001
+
+#11101110101010101
+
+#10000000101010101
+
+#11111111101111101
+
+#10101010000010101
+
+#10101011111010111
+
+#10001010100000101
+
+#11101000111011101
+
+#10001010000000001
+
+#10111011111011101
+
+#10000000001010101
+
+#10101010101010001   
+
+#11111S11111111111
+
+#
+
+#
+
+#
+
+#############################
+
+## ALGORITHME PAR FONCTIONS #
+
+#############################
+
+#
+
+#
+
+#  TRAITEMENT DU FICHIER LABYRINTHE 
+
+## récupère le fichier texte
+
+## lire le fichier 
+
+## Pour chaque carractère on le met dans une liste 
+
+## On crée une matrice qui sera le labyrinthe dont 
+
+## les lignes sont les listes
+
+#
+
+## IDENTIFICATION DES PARRAMETRES 
+
+## identifier les noeuds
+
+#    # on regarde tout les zéros ,
+
+#        # on regarde le nombre de zéro qui entoure ce zéro ,
+
+#            # 1 : cul de sac
+
+#            # 2: c'est juste un chemin
+
+#            # 3 ou 4 : c'est un noeud
+
+
+
+## # === INTERFACE GRAPHIQUE === (utiliser tkinter ou turtle)
+
+## mettre des point noirs au mur et blanc aux chemin 
+
+#    # 0:chemin | 1:mur
+
+## symbole début arrivé 
+
+#    # E:2:entrée , S:3:sortie
+
+## état des cases
+
+#    #4:case actuelle,
+
+#    #5:case visité,
+
+#    #6:cul de sac,
+
+#    #7:meilleur chemin
+
+#
+
+## visualisation d'un point qui se déplace représentant 
+
+#  l'étape de recherche de l'algo, en temps réel ou sous 
+
+#  forme d'animation après calcul
+
+#       # IL s'agit d'un objet qui contient les attribut suivants
+
+        # dans un premier temps
+
+            # sa position dans la matrice 
+
+            # liste de toutes les cases visitées
+
+        # dans un deuxième temps
+
+            # connaissance des chemins 
+
+            # à determiner
+
+# il s'agit de mettre à jour la matrice à chaque étape en 
+
+# modifiant une case vide en case état ou visité 
+
+# voir marquer les chemins menant a des culs de sacs
+
+## Ajouter des couleurs
