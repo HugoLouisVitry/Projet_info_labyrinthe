@@ -7,23 +7,27 @@ import numpy as np
 import operator
 import parcoursmono
 
+
 CHEMIN = 0
 MUR = 1
 ENTREE = 2
 SORTIE = 3
-VISITIED = 5
+UNDEFINED = 4
+VISITED = 5
 ACTUAL = 6
+PATH = 7
+
 
 #Labyrinthe = "C:\A Mes dossiers\Cours\Supérieur\ENAC\Informatique\Projet Labyrinthe\Labyrinthe.txt"
 #Labyrinthe = "/media/Windows/A Mes dossiers/Cours/Supérieur/ENAC/Informatique/Projet Labyrinthe/Labyrinthe.txt"
-Labyrinthe = "lab.txt"
-
-
-
+Labyrinthe = "/home/hugo/Github/Projet_info_labyrinthe/Labyrinthe.txt"
 
 
 # === CONVERSION FICHIER EN MATRICE ===
 def convert_lab(file):
+    """
+    Converti un fichier texte en matrice
+    """
 
     lab = open(file, 'r')
     M = []
@@ -44,35 +48,7 @@ def convert_lab(file):
 
     return lab_matrix
 
-
-
-
-
-
-
 # === IDENTIFICATION DES NOEUDS, DISTANCES ET RELATIONS ===
-
-
-## classe temporaire, on la rempacera par celle du module pour le graphe
-#class parcourmono.Node:
-#    def __init__(self,id):
-#        self.id = id   # coordonnees de la matrice, mettez un tuple
-#        self.neightboors_dist = {} # id voisin + distance
-#        self.how_many_neightboors = len(self.neightboors_dist) # en pratique on lui attribue lors de la recherche des noeuds
-#        self.entry = False
-#        self.exit = False
-#
-#    def define_as_exit(self):
-#        self.exit = True
-#        self.entry = False
-#
-#    def define_as_entry(self):
-#        self.entry = True
-#        self.exit = False
-#    
-#    def __repr__(self):
-#        mot = "entree" if self.entry else "sortie" if self.exit else ""
-#        return f"{str(self.id)}:{str(self.how_many_neightboors)} connections {mot}"
 
 
 #matrice des directions de voisinage [ligne,colone,position physique 0 haut, 1 gauche 2 droite,3 bas]
@@ -80,7 +56,10 @@ coord_neightboor = np.array([       [-1,+0,0],
                              [+0,-1,1],       [+0,1,2],
                                     [+1,+0,3]   ])
 
-def neightboors(i,j,matrix): # compte le nombre de zéro et leur direction autour d'un 0 
+def neightboors(i,j,matrix): 
+    """
+    Compte le nombre de zéro et leur direction autour d'un 0 (chemin)
+    """ 
     l,c = matrix.shape
     nb = 0
     position_0 = [False]*4
@@ -97,6 +76,9 @@ def neightboors(i,j,matrix): # compte le nombre de zéro et leur direction autou
     return nb,position_0
 
 def node_inventory(lab_matrix):
+    """
+    Identifie et répertorie les noeuds dans le labyrinthe
+    """
     l,c = lab_matrix.shape
 
     #contient les noeuds identifiés par coordonnées
@@ -132,7 +114,11 @@ def node_inventory(lab_matrix):
 # ajout des noeuds voisin et de leurs distance (poids)
 #
 # count_0 est lancé seulement si cn donne un zéro comme ça on exlcu déjà le cas de rencontre des murs
-    def count_0(i,j,direction): # récursif
+    def count_0(i,j,direction):
+        """
+        \nIdentifie le poids d'un voisin : en nombre de zéro case de départ exclue
+        \nAlgo récursif
+        """
         way = coord_neightboor[direction]
         dist = int(0)
         k = int(1)
@@ -181,23 +167,52 @@ def node_inventory(lab_matrix):
 
 # === INTERFACE GRAPHIQUE ===
 
-def graphics(matrix):
+def graphics(matrix,history=[],path=[]):
+    """
+    \nInterprétation graphique de la matrice du labyrtinthe
+    \nTouche 'q' pour quitter
+    """
     l,c=matrix.shape
     
     # fenêtre de l'app
     graphic_app = tkinter.Tk()
     graphic_app.title("Recherche dans un labyrinthe")
+    
+    info = tkinter.Toplevel()
+    info.geometry("200x200")
+    info_message = tkinter.StringVar()
+    info_message.set(f"Distance :  \nNoeud : ( , )")
+    info_label = tkinter.Label(info,textvariable=info_message)
+    info_label.pack(expand=True)
+    history_2 = [data[0] for data in history]
 
+        
     # support du dessin lié à la fenêtre
     SIZE = min(800 // l, 1000 // c)
     map_labyrinthe = tkinter.Canvas(graphic_app,width=c*SIZE,height=l*SIZE,bg='black')
     map_labyrinthe.pack() # met le dessin dans la fenêtre
     map_labyrinthe.focus_set()
     map_labyrinthe.bind('q', lambda _: graphic_app.destroy())
+    map_labyrinthe.bind('n', lambda _: story_of_dijkstra(matrix,history,map_labyrinthe,path,info_label,info_message))
+    map_labyrinthe.bind('a', lambda _: splat(matrix,history_2))
+
+    def splat(matrixed,history_splat):
+        if len(history_splat):
+            for node_id in history_splat:
+                (i,j) = node_id
+                matrixed[i][j] = VISITED 
+        draw(map_labyrinthe,matrixed)
+
     draw(map_labyrinthe,matrix)
     graphic_app.mainloop()
 
+
+
+
 def draw(canvas,matrix):
+    """
+    \nDessine les cases de la matrices selon leur roles
+    """
     l,c = matrix.shape
     SIZE = min(800 // l, 1000// c)
     canvas.delete(tkinter.ALL)
@@ -240,39 +255,72 @@ def draw(canvas,matrix):
                     canvas.create_line(x2, (y1+y2)/2, x1, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
                 else:
                     canvas.create_oval(x1, y1, x2, y2, fill='red', outline='black')
-
+            #indéfinie ( debugguage generation de labyrinthe)
+            if matrix[i][j] == UNDEFINED:
+                            x1, y1 = j * SIZE, i * SIZE
+                            x2, y2 = x1 + SIZE, y1 + SIZE
+                            canvas.create_rectangle(x1, y1, x2, y2, fill='BlueViolet', outline='black')
             #case actuelle
             if matrix[i][j] == ACTUAL :
                 x1, y1 = j * SIZE, i * SIZE
                 x2, y2 = x1 + SIZE, y1 + SIZE
                 canvas.create_rectangle(x1, y1, x2, y2, fill='blue', outline='white')
             #case visitée
-            if matrix[i][j] == VISITIED :
+            if matrix[i][j] == VISITED :
+                x1, y1 = j * SIZE, i * SIZE
+                x2, y2 = x1 + SIZE, y1 + SIZE
+                canvas.create_rectangle(x1, y1, x2, y2, fill='green', outline='white')
+            #case du chemin
+            if matrix[i][j] == PATH :
                 x1, y1 = j * SIZE, i * SIZE
                 x2, y2 = x1 + SIZE, y1 + SIZE
                 canvas.create_rectangle(x1, y1, x2, y2, fill='red', outline='white')
 
 def update_final(matrix,path):
-    print(path)
-    for node_id in path:
-        (i,j) = node_id
-        matrix[i][j] = VISITIED 
+    """
+    \nImprime sur la matrice le chemin 'path' (uniquement les noeuds)
+    \nAppeller ensuite 'graphics' pour l'avoir en couleur
+    """
+    #print(path)
+    if len(path):
+        for node_id in path:
+            (i,j) = node_id
+            matrix[i][j] = PATH 
 
 def get_all(lab_file):
+    """
+    \nTransforme le fichier texte en matrice et renvoie l'inventaire des noeuds
+    """
     Lab_matrix = convert_lab(lab_file)
     Nodes = node_inventory(Lab_matrix)[0]
     return Lab_matrix,Nodes
 
-## il s'agit d'un objet qui fera référence 
-## à l'état d'avancement de l'algorithme de recherche 
-## il est la pour faire des test
-#state = [(2,1),[]]
-#
-##met à jour les cases de la matrice numérique
-#def maj(state,matrix):
-#    matrix[state[0]] = 4
-##    for i in state[1]:
-##        matrix[i]
+def story_of_dijkstra(matrix,story,canvas,path,label=tkinter.Label,var=tkinter.StringVar):
+    if not len(story):
+        print("END or UNDEFINED")
+        update_final(matrix,path)
+        draw(canvas,matrix)
+        var.set(f"Distance : {dist} \nMeilleur Chemin {path}" )
+        
+    else :
+        (i,j),dist = story.pop(0)
+        matrix[i][j] = ACTUAL
+        draw(canvas,matrix)
+        matrix[i][j] = VISITED
+        update_final(matrix,path)
+        var.set(f"Distance : {dist} \nNoeud : {(i,j)}")
+    
+    label.update()
+
+
+
+
+
+
+
+    
+
+
 
 if __name__ == '__main__':
     test_lab=convert_lab(Labyrinthe)
