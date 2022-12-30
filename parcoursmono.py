@@ -57,13 +57,15 @@ def dijkstra_mono (nodes) :
 
     nodes[id_entree].dist = 0
     heap =[nodes[id_entree]]
+    history=[]
 
     while heap :
         #print("\n while heap: ",heap)
+        history.append((heap[0].id,heap[0].dist))
         node = pimped_heap.heappop(heap)
         node.closed = True
         if node.id == id_sortie :
-           return (traverse(nodes , id_sortie ), node.dist )
+           return (traverse(nodes , id_sortie ), node.dist ,history)
         for voisin_id in node.neightboors_dist:
             #print("heap: ",heap)
             #print("actual: ",node,voisin_id)
@@ -83,6 +85,7 @@ def dijkstra_mono (nodes) :
                     #print("decrease: ",v)
                     pimped_heap.decrease_key(heap , v )
                 
+                
 
 
 
@@ -98,9 +101,9 @@ if __name__ == '__main__':
     #        id_entree = nodes[NODE].id
     #    if nodes[NODE].exit:
     #        id_sortie = nodes[NODE].id
-    chemin,distance=dijkstra_mono(nodes)
+    chemin,distance,history=dijkstra_mono(nodes)
     print(distance)
     maze_converter.update_final(Graphic_maze,chemin)
-    maze_converter.graphics(Graphic_maze)
+    maze_converter.graphics(Graphic_maze,history,chemin)
 
     
