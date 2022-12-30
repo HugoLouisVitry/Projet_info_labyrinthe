@@ -1,0 +1,13 @@
+maze converter :
+- annotations
+- ajout de case init 
+- Affichage de la recherche en cour ( appuyer sur 'n' ) affiche la case en temps réel
+- fenêtre supplémentaire qui affiche des infos de recherche
+- Affichage de la zone balayée, toutes les cases visitée ( appuyer sur 'a') 
+
+Creer labyrinthe : 
+- Optimisations légères 
+- Problèmes des doubles chemins réglés
+- Entrée sorties aléatoires sur les bords
+Parcoursmono :
+- renvoie désormais une liste 'history' récupérant l'historique des noeuds visités
