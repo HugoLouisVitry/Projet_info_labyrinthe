@@ -246,17 +246,26 @@ def laby(l,c):
 
 
 if __name__ == "__main__":
+
+    t0=time.time()    
+    lab = laby(10,10)
+    print("Laby Executtion time",round(time.time()-t0,10))
     
-    lab = laby(50,50)
     maze_converter.graphics(lab)
+    t0=time.time()
     Nodes = maze_converter.node_inventory(lab)[0]
+    print("Node inventory Executtion time",round(time.time()-t0,10))
+
+
     t0=time.time()
     Chemin, Distance,history = parcoursmono.dijkstra_mono(Nodes)
-    print("Executtion time",round(time.time()-t0,10))
-    print("Chemin",Chemin)
-    maze_converter.update_final(lab,Chemin)
-    maze_converter.graphics(lab,history,Chemin)
+    print("Dijkstra Executtion time",round(time.time()-t0,10))
 
+    #print("Chemin",Chemin)
+    maze_converter.update_final(lab,Chemin)
+ 
+    maze_converter.graphics(lab,history,Chemin)
+ 
     
 
     #lignes, colonnes = lab.shape

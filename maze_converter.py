@@ -112,7 +112,8 @@ def node_inventory(lab_matrix):
 
 
 # ajout des noeuds voisin et de leurs distance (poids)
-#
+
+
 # count_0 est lancé seulement si cn donne un zéro comme ça on exlcu déjà le cas de rencontre des murs
     def count_0(i,j,direction):
         """
@@ -171,6 +172,9 @@ def graphics(matrix,history=[],path=[]):
     """
     \nInterprétation graphique de la matrice du labyrtinthe
     \nTouche 'q' pour quitter
+    \nTouche 'n' pour l'historique
+    \nTouche 'a' pour SPLAT 
+    
     """
     l,c=matrix.shape
     
@@ -194,13 +198,14 @@ def graphics(matrix,history=[],path=[]):
     map_labyrinthe.focus_set()
     map_labyrinthe.bind('q', lambda _: graphic_app.destroy())
     map_labyrinthe.bind('n', lambda _: story_of_dijkstra(matrix,history,map_labyrinthe,path,info_label,info_message))
-    map_labyrinthe.bind('a', lambda _: splat(matrix,history_2))
+    map_labyrinthe.bind('a', lambda _: splat(matrix,history_2,path))
 
-    def splat(matrixed,history_splat):
+    def splat(matrixed,history_splat,path):
         if len(history_splat):
             for node_id in history_splat:
                 (i,j) = node_id
                 matrixed[i][j] = VISITED 
+        update_final(matrix,path)
         draw(map_labyrinthe,matrixed)
 
     draw(map_labyrinthe,matrix)
@@ -276,6 +281,28 @@ def draw(canvas,matrix):
                 x2, y2 = x1 + SIZE, y1 + SIZE
                 canvas.create_rectangle(x1, y1, x2, y2, fill='red', outline='white')
 
+def story_of_dijkstra(matrix,story,canvas,path,label=tkinter.Label,var=tkinter.StringVar):
+    """
+    \nRetrace les étapes de la recherche sur l'interface graphique 
+    """
+    if not len(story):
+        print("END or UNDEFINED")
+        update_final(matrix,path)
+        draw(canvas,matrix)
+        var.set(f"Distance : {dist} \nMeilleur Chemin {path}" )
+        
+    else :
+        (i,j),dist = story.pop(0)
+        matrix[i][j] = ACTUAL
+        draw(canvas,matrix)
+        matrix[i][j] = VISITED
+        update_final(matrix,path)
+        var.set(f"Distance : {dist} \nNoeud : {(i,j)}")
+    
+    label.update()
+
+# === Autres ===
+
 def update_final(matrix,path):
     """
     \nImprime sur la matrice le chemin 'path' (uniquement les noeuds)
@@ -294,32 +321,6 @@ def get_all(lab_file):
     Lab_matrix = convert_lab(lab_file)
     Nodes = node_inventory(Lab_matrix)[0]
     return Lab_matrix,Nodes
-
-def story_of_dijkstra(matrix,story,canvas,path,label=tkinter.Label,var=tkinter.StringVar):
-    if not len(story):
-        print("END or UNDEFINED")
-        update_final(matrix,path)
-        draw(canvas,matrix)
-        var.set(f"Distance : {dist} \nMeilleur Chemin {path}" )
-        
-    else :
-        (i,j),dist = story.pop(0)
-        matrix[i][j] = ACTUAL
-        draw(canvas,matrix)
-        matrix[i][j] = VISITED
-        update_final(matrix,path)
-        var.set(f"Distance : {dist} \nNoeud : {(i,j)}")
-    
-    label.update()
-
-
-
-
-
-
-
-    
-
 
 
 if __name__ == '__main__':
