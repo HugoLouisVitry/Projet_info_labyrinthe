@@ -243,11 +243,11 @@ def draw(canvas=tkinter.Canvas,matrix=np.array):
                 canvas.create_rectangle(x1, y1, x2, y2, fill='red', outline='white')
             
             if not i:
-                canvas.create_rectangle(x1, y1, x2, y2, fill='LemonChiffon3', outline='white')
+                canvas.create_rectangle(x1, y1, x2, y2, fill='black', outline='white')
                 canvas.create_text((x1+(x2-x1)/2, y1 + (y2-y1)/2), text = f"{j}", fill='white')
 
             if not j:
-                canvas.create_rectangle(x1, y1, x2, y2, fill='LemonChiffon3', outline='white')
+                canvas.create_rectangle(x1, y1, x2, y2, fill='black', outline='white')
                 canvas.create_text((x1+(x2-x1)/2, y1 + (y2-y1)/2), text = f"{i}", fill='white')
 
             #entrée
