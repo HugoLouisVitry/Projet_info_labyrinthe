@@ -214,7 +214,7 @@ def graphics(matrix,history=[],path=[]):
 
 
 
-def draw(canvas,matrix):
+def draw(canvas=tkinter.Canvas,matrix=np.array):
     """
     \nDessine les cases de la matrices selon leur roles
     """
@@ -223,16 +223,35 @@ def draw(canvas,matrix):
     canvas.delete(tkinter.ALL)
     for i in range(len(matrix)):
         for j in range(len(matrix[0])):
-            
+            x1, y1 = j * SIZE, i * SIZE
+            x2, y2 = x1 + SIZE, y1 + SIZE
             #labyrinthe
             if not matrix[i][j]:
-                x1, y1 = j * SIZE, i * SIZE
-                x2, y2 = x1 + SIZE, y1 + SIZE
                 canvas.create_rectangle(x1, y1, x2, y2, fill='white', outline='black')
+
+            #indéfinie ( debugguage generation de labyrinthe)
+            if matrix[i][j] == UNDEFINED:
+                canvas.create_rectangle(x1, y1, x2, y2, fill='BlueViolet', outline='black')
+            #case actuelle
+            if matrix[i][j] == ACTUAL :
+                canvas.create_rectangle(x1, y1, x2, y2, fill='blue', outline='white')
+            #case visitée
+            if matrix[i][j] == VISITED :
+                canvas.create_rectangle(x1, y1, x2, y2, fill='green', outline='white')
+            #case du chemin
+            if matrix[i][j] == PATH :
+                canvas.create_rectangle(x1, y1, x2, y2, fill='red', outline='white')
+            
+            if not i:
+                canvas.create_rectangle(x1, y1, x2, y2, fill='LemonChiffon3', outline='white')
+                canvas.create_text((x1+(x2-x1)/2, y1 + (y2-y1)/2), text = f"{j}", fill='white')
+
+            if not j:
+                canvas.create_rectangle(x1, y1, x2, y2, fill='LemonChiffon3', outline='white')
+                canvas.create_text((x1+(x2-x1)/2, y1 + (y2-y1)/2), text = f"{i}", fill='white')
+
             #entrée
             if matrix[i][j] == ENTREE :
-                x1, y1 = j * SIZE, i * SIZE
-                x2, y2 = x1 + SIZE, y1 + SIZE
                 canvas.create_rectangle(x1, y1, x2, y2, fill='white', outline='black')
 
                 if i == 0 and j != 0:
@@ -247,8 +266,6 @@ def draw(canvas,matrix):
                     canvas.create_oval(x1, y1, x2, y2, fill='green', outline='black')
             #sortie
             if matrix[i][j] == SORTIE :
-                x1, y1 = j * SIZE, i * SIZE
-                x2, y2 = x1 + SIZE, y1 + SIZE
                 canvas.create_rectangle(x1, y1, x2, y2, fill='white', outline='black')
                 if i == len(matrix) - 1 and j != 0:
                     canvas.create_line((x1+x2)/2, y1, (x1+x2)/2, y2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
@@ -260,26 +277,6 @@ def draw(canvas,matrix):
                     canvas.create_line(x2, (y1+y2)/2, x1, (y1+y2)/2, arrow=tkinter.LAST, fill='red', arrowshape= ((y2-y1)/6,(y2-y1)/4,(x2-x1)/4), width=(x2-x1)/5)
                 else:
                     canvas.create_oval(x1, y1, x2, y2, fill='red', outline='black')
-            #indéfinie ( debugguage generation de labyrinthe)
-            if matrix[i][j] == UNDEFINED:
-                            x1, y1 = j * SIZE, i * SIZE
-                            x2, y2 = x1 + SIZE, y1 + SIZE
-                            canvas.create_rectangle(x1, y1, x2, y2, fill='BlueViolet', outline='black')
-            #case actuelle
-            if matrix[i][j] == ACTUAL :
-                x1, y1 = j * SIZE, i * SIZE
-                x2, y2 = x1 + SIZE, y1 + SIZE
-                canvas.create_rectangle(x1, y1, x2, y2, fill='blue', outline='white')
-            #case visitée
-            if matrix[i][j] == VISITED :
-                x1, y1 = j * SIZE, i * SIZE
-                x2, y2 = x1 + SIZE, y1 + SIZE
-                canvas.create_rectangle(x1, y1, x2, y2, fill='green', outline='white')
-            #case du chemin
-            if matrix[i][j] == PATH :
-                x1, y1 = j * SIZE, i * SIZE
-                x2, y2 = x1 + SIZE, y1 + SIZE
-                canvas.create_rectangle(x1, y1, x2, y2, fill='red', outline='white')
 
 def story_of_dijkstra(matrix,story,canvas,path,label=tkinter.Label,var=tkinter.StringVar):
     """
@@ -289,7 +286,7 @@ def story_of_dijkstra(matrix,story,canvas,path,label=tkinter.Label,var=tkinter.S
         print("END or UNDEFINED")
         update_final(matrix,path)
         draw(canvas,matrix)
-        var.set(f"Distance : {dist} \nMeilleur Chemin {path}" )
+        var.set(f"\nMeilleur Chemin {path}" )
         
     else :
         (i,j),dist = story.pop(0)
