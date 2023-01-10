@@ -8,6 +8,7 @@ import operator
 import parcoursmono
 
 
+
 CHEMIN = 0
 MUR = 1
 ENTREE = 2
@@ -168,7 +169,7 @@ def node_inventory(lab_matrix):
 
 # === INTERFACE GRAPHIQUE ===
 
-def graphics(matrix,history=[],path=[]):
+def graphics(matrix,history=[],path=[],reset=0,history_reverse=[]):
     """
     \nInterprétation graphique de la matrice du labyrtinthe
     \nTouche 'q' pour quitter
@@ -188,25 +189,31 @@ def graphics(matrix,history=[],path=[]):
     info_message.set(f"Distance :  \nNoeud : ( , )")
     info_label = tkinter.Label(info,textvariable=info_message)
     info_label.pack(expand=True)
-    history_2 = [data[0] for data in history]
-
+    history_ = [data[0] for data in history]
+    history_rev_ = [data[0] for data in history_reverse]
         
     # support du dessin lié à la fenêtre
     SIZE = min(800 // l, 1000 // c)
-    map_labyrinthe = tkinter.Canvas(graphic_app,width=c*SIZE,height=l*SIZE,bg='black')
+    map_labyrinthe = tkinter.Canvas(graphic_app,width=c*SIZE,height=l*SIZE,bg='grey')
     map_labyrinthe.pack() # met le dessin dans la fenêtre
     map_labyrinthe.focus_set()
     map_labyrinthe.bind('q', lambda _: graphic_app.destroy())
     map_labyrinthe.bind('n', lambda _: story_of_dijkstra(matrix,history,map_labyrinthe,path,info_label,info_message))
-    map_labyrinthe.bind('a', lambda _: splat(matrix,history_2,path))
+    map_labyrinthe.bind('a', lambda _: splat(matrix,history_,path,reset,history_rev_))
 
-    def splat(matrixed,history_splat,path):
+    def splat(Matrix,history_splat,path,reset=0,History_reverse=[]):
+        
+        color = CHEMIN if reset else VISITED
         if len(history_splat):
-            for node_id in history_splat:
-                (i,j) = node_id
-                matrixed[i][j] = VISITED 
+            for (i,j) in history_splat:
+                Matrix[i][j] =  color
+
+        if len(History_reverse):
+            for (i,j) in History_reverse:
+                Matrix[i][j] =  MUR
+    
         update_final(matrix,path)
-        draw(map_labyrinthe,matrixed)
+        draw(map_labyrinthe,Matrix)
 
     draw(map_labyrinthe,matrix)
     graphic_app.mainloop()
@@ -226,6 +233,9 @@ def draw(canvas=tkinter.Canvas,matrix=np.array):
             x1, y1 = j * SIZE, i * SIZE
             x2, y2 = x1 + SIZE, y1 + SIZE
             #labyrinthe
+            if matrix[i][j] == MUR:
+                canvas.create_rectangle(x1, y1, x2, y2, fill='black', outline='black')
+            
             if not matrix[i][j]:
                 canvas.create_rectangle(x1, y1, x2, y2, fill='white', outline='black')
 
@@ -235,6 +245,8 @@ def draw(canvas=tkinter.Canvas,matrix=np.array):
             #case actuelle
             if matrix[i][j] == ACTUAL :
                 canvas.create_rectangle(x1, y1, x2, y2, fill='blue', outline='white')
+                canvas.create_text((x1+(x2-x1)/2, y1 + (y2-y1)/2), text = f"({i},{j})", fill='white')
+
             #case visitée
             if matrix[i][j] == VISITED :
                 canvas.create_rectangle(x1, y1, x2, y2, fill='green', outline='white')
@@ -243,11 +255,11 @@ def draw(canvas=tkinter.Canvas,matrix=np.array):
                 canvas.create_rectangle(x1, y1, x2, y2, fill='red', outline='white')
             
             if not i:
-                canvas.create_rectangle(x1, y1, x2, y2, fill='black', outline='white')
+
                 canvas.create_text((x1+(x2-x1)/2, y1 + (y2-y1)/2), text = f"{j}", fill='white')
 
             if not j:
-                canvas.create_rectangle(x1, y1, x2, y2, fill='black', outline='white')
+
                 canvas.create_text((x1+(x2-x1)/2, y1 + (y2-y1)/2), text = f"{i}", fill='white')
 
             #entrée
