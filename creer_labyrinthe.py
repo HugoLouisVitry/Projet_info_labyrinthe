@@ -3,6 +3,7 @@ import random
 import maze_converter
 import parcoursmono
 import time
+RESET = 1
 CHEMIN = 0
 MUR = 1
 ENTREE = 2
@@ -247,26 +248,42 @@ def laby(l,c):
 
 if __name__ == "__main__":
 
-    t0=time.time()    
-    lab = laby(10,10)
-    print("Laby Executtion time",round(time.time()-t0,10))
-    
-    maze_converter.graphics(lab)
     t0=time.time()
-    Nodes = maze_converter.node_inventory(lab)[0]
-    print("Node inventory Executtion time",round(time.time()-t0,10))
-
-
-    t0=time.time()
-    Chemin, Distance,history = parcoursmono.dijkstra_mono(Nodes)
-    print("Dijkstra Executtion time",round(time.time()-t0,10))
-
-    #print("Chemin",Chemin)
-    maze_converter.update_final(lab,Chemin)
- 
-    maze_converter.graphics(lab,history,Chemin)
- 
+    lab = laby(200,200)
+    working_lab = lab.copy()
+    print("Laby Execution time",round(time.time()-t0,10))
     
+    maze_converter.graphics(working_lab)
+    t0=time.time()
+    Nodes = maze_converter.node_inventory(working_lab)[0]
+    print("Node inventory Execution time",round(time.time()-t0,10))
+
+
+
+    Chemin, Distance,history,T = parcoursmono.dijkstra_mono(Nodes)
+    print("Simple Dijkstra Execution time",round(T,10))
+
+    
+    print("Chemin mono ",Chemin)
+    #maze_converter.update_final(working_lab,Chemin)
+    #maze_converter.graphics(working_lab,history,Chemin)
+    
+    working_lab = lab.copy()
+
+    Chemin2, Distance2,history2,history2_reverse,h_total,T = parcoursmono.dijkstra_double(Nodes)
+    print("Double Dijkstra Execution time",round(T,10))
+
+    print("Chemin double ",Chemin2)
+
+    #maze_converter.graphics(working_lab,reset=RESET)
+
+    #maze_converter.update_final(working_lab,Chemin2)
+    #maze_converter.graphics(working_lab)
+    #maze_converter.graphics(working_lab,h_total,Chemin2,history_reverse=history2_reverse)
+    lab = laby(200,200)
+    Nodes = maze_converter.node_inventory(working_lab)[0]
+    Chemin, Distance,history,T = parcoursmono.dijkstra_mono(Nodes)
+    Chemin2, Distance2,history2,history2_reverse,h_total,T = parcoursmono.dijkstra_double(Nodes)
 
     #lignes, colonnes = lab.shape
     #f = open("lab.txt", 'w')
