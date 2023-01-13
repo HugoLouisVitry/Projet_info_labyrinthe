@@ -45,6 +45,7 @@ def convert_lab(file):
                 if k == len(line)-1:
                     pass            
         M.append(L)
+    lab.close()
     lab_matrix = np.array(M)
 
     return lab_matrix
