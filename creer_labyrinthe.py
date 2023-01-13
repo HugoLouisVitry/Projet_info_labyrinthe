@@ -244,46 +244,72 @@ def laby(l,c):
     #print(lab)
     return lab
 
+def save_lab(lab=np.array,file_name=str,folder = str):
+    """Sauvegarde un labyrinthe sous format fichier texte"""
+    l,c = lab.shape
 
+    with open(folder+file_name+'.txt', 'w') as f:
+        for i in range(l):
+            for j in range(c):    
+                f.write(str(lab[i][j]))
+            f.write('\n')
+
+def create_database(n,folder):
+    """ 
+    \nCrée n-30 labyrinthes de taille 30 à n
+    \nPlacée dans "folder", pensez à indique un chemin absolu si le relatif ne marche pas
+    """
+    if n <= 30 :
+        return "\n Please give n > 30 "
+    total_time = 0 
+    for i in range(30,n+1):
+        t0 =time.time()
+        lab = laby(i,i)
+        save_lab(lab,str(i)+"x"+str(i),folder)
+        T = time.time()- t0
+        total_time += T
+        print(f"Execution time for size {i}x{i} : ",round(T,2))
+    
+    print("Done. Total execution time : ",total_time)
 
 if __name__ == "__main__":
 
-    t0=time.time()
-    lab = laby(200,200)
-    working_lab = lab.copy()
-    print("Laby Execution time",round(time.time()-t0,10))
+#    t0=time.time()
+#    lab = laby(200,200)
+#    working_lab = lab.copy()
+#    print("Laby Execution time",round(time.time()-t0,10))
+#    
+#    maze_converter.graphics(working_lab)
+#    t0=time.time()
+#    Nodes = maze_converter.node_inventory(working_lab)[0]
+#    print("Node inventory Execution time",round(time.time()-t0,10))#
+
+
+
+#    Chemin, Distance,history,T = parcoursmono.dijkstra_mono(Nodes)
+#    print("Simple Dijkstra Execution time",round(T,10))
+
     
-    maze_converter.graphics(working_lab)
-    t0=time.time()
-    Nodes = maze_converter.node_inventory(working_lab)[0]
-    print("Node inventory Execution time",round(time.time()-t0,10))
-
-
-
-    Chemin, Distance,history,T = parcoursmono.dijkstra_mono(Nodes)
-    print("Simple Dijkstra Execution time",round(T,10))
-
-    
-    print("Chemin mono ",Chemin)
-    #maze_converter.update_final(working_lab,Chemin)
+#    print("Chemin mono ",Chemin)
+#    #maze_converter.update_final(working_lab,Chemin)
     #maze_converter.graphics(working_lab,history,Chemin)
     
-    working_lab = lab.copy()
+#    working_lab = lab.copy()
 
-    Chemin2, Distance2,history2,history2_reverse,h_total,T = parcoursmono.dijkstra_double(Nodes)
-    print("Double Dijkstra Execution time",round(T,10))
+#    Chemin2, Distance2,history2,history2_reverse,h_total,T = parcoursmono.dijkstra_double(Nodes)
+ #   print("Double Dijkstra Execution time",round(T,10))
 
-    print("Chemin double ",Chemin2)
+#    print("Chemin double ",Chemin2)
 
     #maze_converter.graphics(working_lab,reset=RESET)
 
     #maze_converter.update_final(working_lab,Chemin2)
     #maze_converter.graphics(working_lab)
     #maze_converter.graphics(working_lab,h_total,Chemin2,history_reverse=history2_reverse)
-    lab = laby(200,200)
-    Nodes = maze_converter.node_inventory(working_lab)[0]
-    Chemin, Distance,history,T = parcoursmono.dijkstra_mono(Nodes)
-    Chemin2, Distance2,history2,history2_reverse,h_total,T = parcoursmono.dijkstra_double(Nodes)
+#    lab = laby(200,200)
+#    Nodes = maze_converter.node_inventory(working_lab)[0]
+#    Chemin, Distance,history,T = parcoursmono.dijkstra_mono(Nodes)
+#    Chemin2, Distance2,history2,history2_reverse,h_total,T = parcoursmono.dijkstra_double(Nodes)
 
     #lignes, colonnes = lab.shape
     #f = open("lab.txt", 'w')
