@@ -9,11 +9,14 @@ Tmono , Tbidi = [] , []
 fichier_excel_courbes = xlwt.Workbook()
 feuille1 = fichier_excel_courbes.add_sheet('feuille1')
 feuille1.write(0,0, 'taille du labyrinthe')
-feuille1.write(0,1, 'temps mono')
-feuille1.write(0,2, 'temps bidi')
+feuille1.write(0,2, 'distance parcourue')
+feuille1.write(0,3, 'temps mono')
+feuille1.write(0,4, 'temps bidi')
+feuille1.write(0,6, 'nombre de noeuds')
+
 
 for i in range(30,301) : 
-    Maze_file= ("database\{}*{}.txt").format(i,i) #penser à mettre le vrai chemin sur vos pc (ou se trouve database)
+    Maze_file= ("database\{}x{}.txt").format(i,i) #penser à mettre le vrai chemin sur vos pc (ou se trouve database)
     Graphic_maze,nodes = maze_converter.get_all(Maze_file)
     lab = creer_labyrinthe.laby(i,i)
     maze_converter.graphics(Graphic_maze)
@@ -24,9 +27,11 @@ for i in range(30,301) :
     Tbidi.append(Tb)
     Tmono.append(Tm)
     list_dist_max.append(Distance)
-    feuille1.write(i,0 ,i)
-    feuille1.write(i,1 , Tmono)
-    feuille1.write(i,1 , Tbidi)
+    feuille1.write(i-29,0 ,i)
+    feuille1.write(i-29,2 , Distance)
+    feuille1.write(i-29,3 , Tm)
+    feuille1.write(i-29,4 , Tb)
+    feuille1.write(i-29,6 , N)
 
 
 fichier_excel_courbes.save('fichier courbes.xls')
