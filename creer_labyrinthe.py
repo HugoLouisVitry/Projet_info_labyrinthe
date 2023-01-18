@@ -32,7 +32,7 @@ def chemins_voisins(mur,lab):
             nb += 1
     return nb
             
-def make_murs(lignes, colonnes,lab):
+def creer_murs(lignes, colonnes,lab):
     """
     \nChange les cases indéfinies non modifiées en mur
     """
@@ -40,30 +40,16 @@ def make_murs(lignes, colonnes,lab):
         for j in range(colonnes):
             if (lab[i][j] == INIT):
                 lab[i][j] = MUR
-                
 def entree_sortie(lignes, colonnes,lab):
-    """
-    \nPlace l'entrée et la sortie aléatoirement sur les bords
-    """
-    e_s_candidates=[]
+    for i in range(lignes):
+        if (lab[1][i] == 0):
+            lab[0][i] = ENTREE
+            break
+    for i in range(colonnes-1, 0, -1):
+        if (lab[lignes-2][i] == 0):
+            lab[lignes-1][i] = SORTIE
+            break                
 
-    for j in range(colonnes):
-        if (lab[1][j] == CHEMIN):
-            e_s_candidates.append([0,j])
-        if (lab[lignes-2][j] == CHEMIN):
-            e_s_candidates.append([lignes-1,j])
-
-    for i in range(1,lignes-1):
-        if (lab[i][1] == CHEMIN):
-            e_s_candidates.append([i,0])
-        if (lab[i][colonnes-2] == CHEMIN):
-            e_s_candidates.append([i,colonnes-1])
-
-    k=random.choice(e_s_candidates)
-    e_s_candidates.remove(k)
-    lab[k[0]][k[1]] = ENTREE
-    k=random.choice(e_s_candidates)
-    lab[k[0]][k[1]] = SORTIE
 
 def creer_lab(lignes, colonnes):
     """
@@ -98,7 +84,7 @@ def creer_lab(lignes, colonnes):
     #maze_converter.graphics(lab)
     
     
-    def delete_wall(mur):
+    def supp_mur(mur):
         for m in murs:
             if (m[0] == mur[0] and m[1] == mur[1]):
                 murs.remove(mur)
@@ -126,16 +112,14 @@ def creer_lab(lignes, colonnes):
                         if ([mur[0]+1, mur[1]] not in murs):
                             murs.append([mur[0]+1, mur[1]])
     
-    				# Leftmost cell
+    				
                     if (mur[1] != 0): # gauche
                         if (lab[mur[0]][mur[1]-1] != CHEMIN):
                             lab[mur[0]][mur[1]-1] = MUR
                         if ([mur[0], mur[1]-1] not in murs):
                             murs.append([mur[0], mur[1]-1])
     			
-                    
-                
-                delete_wall(mur)
+                supp_mur(mur)
                 
                 
             
@@ -162,7 +146,7 @@ def creer_lab(lignes, colonnes):
                             murs.append([mur[0], mur[1]+1])
                                 
                     
-                delete_wall(mur)
+                supp_mur(mur)
                
     
                 
@@ -188,7 +172,7 @@ def creer_lab(lignes, colonnes):
                         if ([mur[0]-1, mur[1]] not in murs):
                             murs.append([mur[0]-1, mur[1]])
                             
-                delete_wall(mur)
+                supp_mur(mur)
                 
     
         if mur[0] != lignes -1:# bas
@@ -214,12 +198,12 @@ def creer_lab(lignes, colonnes):
                             murs.append([mur[0], mur[1]+1])
                     
         
-                delete_wall(mur)
+                supp_mur(mur)
                 
-        delete_wall(mur)   
+        supp_mur(mur)   
 
     #print(w,"itérations")
-    make_murs(lignes, colonnes,lab)
+    creer_murs(lignes, colonnes,lab)
     entree_sortie(lignes, colonnes,lab)
     return lab
 
@@ -244,72 +228,47 @@ def laby(l,c):
     #print(lab)
     return lab
 
-def save_lab(lab=np.array,file_name=str,folder = str):
-    """Sauvegarde un labyrinthe sous format fichier texte"""
-    l,c = lab.shape
 
-    with open(folder+file_name+'.txt', 'w') as f:
-        for i in range(l):
-            for j in range(c):    
-                f.write(str(lab[i][j]))
-            f.write('\n')
-
-def create_database(n,folder):
-    """ 
-    \nCrée n-30 labyrinthes de taille 30 à n
-    \nPlacée dans "folder", pensez à indique un chemin absolu si le relatif ne marche pas
-    """
-    if n <= 30 :
-        return "\n Please give n > 30 "
-    total_time = 0 
-    for i in range(30,n+1):
-        t0 =time.time()
-        lab = laby(i,i)
-        save_lab(lab,str(i)+"x"+str(i),folder)
-        T = time.time()- t0
-        total_time += T
-        print(f"Execution time for size {i}x{i} : ",round(T,2))
-    
-    print("Done. Total execution time : ",total_time)
 
 if __name__ == "__main__":
+    
+    lignes, colonnes = 20,30
+    t0=time.time()
+    lab = laby(lignes,colonnes)
+    working_lab = lab.copy()
+    print("Laby Execution time",round(time.time()-t0,10))
+    
+    maze_converter.graphics(working_lab)
+    t0=time.time()
+    Nodes = maze_converter.node_inventory(working_lab)[0]
+    print("Node inventory Execution time",round(time.time()-t0,10))
 
-#    t0=time.time()
-#    lab = laby(200,200)
-#    working_lab = lab.copy()
-#    print("Laby Execution time",round(time.time()-t0,10))
-#    
-#    maze_converter.graphics(working_lab)
-#    t0=time.time()
-#    Nodes = maze_converter.node_inventory(working_lab)[0]
-#    print("Node inventory Execution time",round(time.time()-t0,10))#
 
 
-
-#    Chemin, Distance,history,T = parcoursmono.dijkstra_mono(Nodes)
-#    print("Simple Dijkstra Execution time",round(T,10))
+    Chemin, Distance,history,T = parcoursmono.dijkstra_mono(Nodes)
+    print("Simple Dijkstra Execution time",round(T,10))
 
     
-#    print("Chemin mono ",Chemin)
-#    #maze_converter.update_final(working_lab,Chemin)
+    print("Chemin mono ",Chemin)
+    #maze_converter.update_final(working_lab,Chemin)
     #maze_converter.graphics(working_lab,history,Chemin)
     
-#    working_lab = lab.copy()
+    working_lab = lab.copy()
 
-#    Chemin2, Distance2,history2,history2_reverse,h_total,T = parcoursmono.dijkstra_double(Nodes)
- #   print("Double Dijkstra Execution time",round(T,10))
+    Chemin2, Distance2,history2,history2_reverse,h_total,T = parcoursmono.dijkstra_double(Nodes)
+    print("Double Dijkstra Execution time",round(T,10))
 
-#    print("Chemin double ",Chemin2)
+    print("Chemin double ",Chemin2)
 
     #maze_converter.graphics(working_lab,reset=RESET)
 
     #maze_converter.update_final(working_lab,Chemin2)
     #maze_converter.graphics(working_lab)
     #maze_converter.graphics(working_lab,h_total,Chemin2,history_reverse=history2_reverse)
-#    lab = laby(200,200)
-#    Nodes = maze_converter.node_inventory(working_lab)[0]
-#    Chemin, Distance,history,T = parcoursmono.dijkstra_mono(Nodes)
-#    Chemin2, Distance2,history2,history2_reverse,h_total,T = parcoursmono.dijkstra_double(Nodes)
+    lab = laby(lignes,colonnes)
+    Nodes = maze_converter.node_inventory(working_lab)[0]
+    Chemin, Distance,history,T = parcoursmono.dijkstra_mono(Nodes)
+    Chemin2, Distance2,history2,history2_reverse,h_total,T = parcoursmono.dijkstra_double(Nodes)
 
     #lignes, colonnes = lab.shape
     #f = open("lab.txt", 'w')
@@ -321,6 +280,3 @@ if __name__ == "__main__":
     #f.close()
     #lab = creer_lab(15,15)
     #maze_converter.graphics(lab)
-    
-
-
