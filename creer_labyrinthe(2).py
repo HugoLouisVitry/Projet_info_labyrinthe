@@ -127,8 +127,6 @@ def creer_lab(lignes, colonnes):
                             lab[mur[0]+1][mur[1]] = MUR
                         if ([mur[0]+1, mur[1]] not in murs):
                             murs.append([mur[0]+1, mur[1]])
-    
-    				# Leftmost cell
                     if (mur[1] != 0): # gauche
                         if (lab[mur[0]][mur[1]-1] != CHEMIN):
                             lab[mur[0]][mur[1]-1] = MUR
